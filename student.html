@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>생물과 환경 탐구</title>
+<style>
+:root{
+  --bg:#f6f8f3;--card:#fff;--ink:#1f2a1f;--muted:#5f6b5f;--line:#dfe6d8;
+  --green:#4c9a2a;--green-soft:#e7f3df;--blue:#2f72b8;--blue-soft:#e3eefa;
+  --orange:#d97b1f;--orange-soft:#fcefdf;--purple:#7a4fb3;--purple-soft:#efe7f9;
+  --red:#c8412f;--red-soft:#fbe6e3;--gray-soft:#eef1ec;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",sans-serif;line-height:1.55}
+header{background:var(--green);color:#fff;padding:14px 16px}
+header h1{margin:0;font-size:1.25rem}
+header p{margin:2px 0 0;font-size:.9rem;opacity:.9}
+nav{display:flex;gap:6px;overflow-x:auto;padding:10px 16px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+nav button{flex:0 0 auto;border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 12px;font:inherit;font-size:.9rem;cursor:pointer;color:var(--ink)}
+nav button.on{background:var(--green);border-color:var(--green);color:#fff}
+nav button.done::after{content:" ✓"}
+main{max-width:960px;margin:0 auto;padding:16px}
+section{display:none}
+section.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+h2{font-size:1.2rem;margin:0 0 6px}
+h3{font-size:1.02rem;margin:0 0 8px}
+.goal{font-size:.88rem;color:var(--muted);margin:0 0 12px}
+.btn{border:0;border-radius:10px;padding:9px 14px;font:inherit;cursor:pointer;background:var(--green);color:#fff}
+.btn.ghost{background:var(--gray-soft);color:var(--ink)}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chip{border:1px dashed var(--green);background:var(--green-soft);color:var(--ink);border-radius:999px;padding:5px 11px;font:inherit;font-size:.88rem;cursor:pointer}
+textarea,input,select{width:100%;font:inherit;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+textarea{min-height:70px;resize:vertical}
+label{display:block;font-weight:600;font-size:.92rem;margin:10px 0 4px}
+.scene{background:linear-gradient(#e6f3ff,#f4fbef);border-radius:12px;padding:14px;text-align:center;font-size:1.05rem}
+.scene .big{font-size:2.4rem;letter-spacing:6px}
+.qlist li{margin:4px 0}
+.star{cursor:pointer;border:0;background:none;font-size:1.1rem}
+/* 분류 */
+.pool{display:flex;flex-wrap:wrap;gap:8px;min-height:52px;padding:10px;border:2px dashed var(--line);border-radius:12px;background:#fafcf8}
+.item{border:2px solid var(--line);background:#fff;border-radius:12px;padding:6px 10px;font:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:5px}
+.item .e{font-size:1.3rem}
+.item.sel{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft)}
+.item.ok{border-color:var(--green);background:var(--green-soft)}
+.item.no{border-color:var(--red);background:var(--red-soft)}
+.bins{display:grid;grid-template-columns:1fr 2.4fr;gap:10px;margin-top:12px}
+.bio{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.bin{border-radius:12px;padding:8px;min-height:120px;cursor:pointer;border:2px solid transparent}
+.bin h4{margin:0 0 6px;font-size:.95rem}
+.bin small{display:block;color:var(--muted);font-size:.78rem;margin-bottom:6px}
+.bin .in{display:flex;flex-wrap:wrap;gap:6px}
+.bin.target{border-color:var(--blue)}
+.b-abiotic{background:var(--blue-soft)}
+.b-producer{background:var(--green-soft)}
+.b-consumer{background:var(--orange-soft)}
+.b-decomposer{background:var(--purple-soft)}
+.biowrap{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px}
+.biowrap>h4{margin:0 0 6px;font-size:.95rem}
+.feedback{margin-top:10px;padding:10px 12px;border-radius:10px;background:var(--gray-soft);font-size:.92rem}
+.feedback:empty{display:none}
+/* 사례 */
+.cases{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.case{border:1px solid var(--line);border-radius:14px;padding:12px;background:#fff}
+.case .em{font-size:2rem}
+.case p{margin:4px 0 8px;font-size:.93rem}
+.case .opts{display:flex;flex-wrap:wrap;gap:5px;margin:4px 0}
+.opt{border:1px solid var(--line);background:#fff;border-radius:8px;padding:4px 8px;font:inherit;font-size:.84rem;cursor:pointer;color:var(--ink)}
+.opt.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.case .res{font-size:.85rem;margin-top:8px;padding:8px;border-radius:8px}
+.case .res.ok{background:var(--green-soft)}
+.case .res.no{background:var(--red-soft)}
+.case.solved{border-color:var(--green)}
+.tag{display:inline-block;font-size:.75rem;padding:2px 7px;border-radius:999px;background:var(--gray-soft);color:var(--muted)}
+.score{font-weight:700;color:var(--green)}
+/* 모둠 카드 */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.preview{border:2px solid var(--green);border-radius:14px;padding:14px;background:#fff}
+.preview .arrow{display:flex;align-items:center;justify-content:center;gap:10px;font-weight:700;margin:10px 0;text-align:center}
+.preview .box{padding:8px 12px;border-radius:10px;min-width:90px}
+.preview .ar{font-size:1.6rem;color:var(--green)}
+.quiz li{margin-bottom:14px}
+.quiz .opts{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.small{font-size:.85rem;color:var(--muted)}
+footer{text-align:center;color:var(--muted);font-size:.8rem;padding:20px}
+@media (max-width:700px){
+  .bins{grid-template-columns:1fr}
+  .bio{grid-template-columns:1fr}
+  .grid2{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>🌿 생물과 환경 — 탐구 노트</h1>
+  <p>통합과학 Ⅱ-1 생태계와 환경 · 내가 묻고, 내가 찾고, 우리가 설명한다</p>
+</header>
+<nav id="nav">
+  <button data-s="0" class="on">① 질문 만들기</button>
+  <button data-s="1">② 연못 생태계 분류</button>
+  <button data-s="2">③ 상호 관계 탐정</button>
+  <button data-s="3">④ 우리 모둠 탐구 카드</button>
+  <button data-s="4">⑤ 스스로 확인</button>
+</nav>
+<main>
+
+<!-- ① 질문 만들기 -->
+<section id="s0" class="on">
+  <div class="card">
+    <h2>① 질문으로 시작하기</h2>
+    <p class="goal">관찰한 장면에서 궁금한 점을 질문으로 만들어 봐요. 좋은 질문이 탐구의 출발점이에요.</p>
+    <div class="scene">
+      <div class="big">🪱🟫🥬🥬🥬</div>
+      <p>지렁이가 사는 밭에서는 비료를 많이 쓰지 않아도 배추가 잘 자란다.</p>
+    </div>
+    <label for="q-in">내가 궁금한 것 (질문 시작말을 눌러도 좋아요)</label>
+    <div class="row" id="q-starters" style="margin-bottom:6px"></div>
+    <textarea id="q-in" placeholder="예) 지렁이는 흙에 무엇을 하길래 배추가 잘 자랄까?"></textarea>
+    <div class="row" style="margin-top:8px"><button class="btn" id="q-add">질문 추가</button><span class="small">질문 3개 이상 만들고, 가장 탐구하고 싶은 질문에 ⭐를 눌러요.</span></div>
+    <ol class="qlist" id="q-list"></ol>
+  </div>
+  <div class="card">
+    <h3>💡 질문 살펴보기</h3>
+    <p class="small">내 질문에 '생물'과 '환경(빛, 공기, 온도, 물, 토양)'이 둘 다 들어 있나요? 둘 사이의 <b>관계</b>를 묻는 질문이 이번 시간의 핵심 질문이에요.</p>
+  </div>
+</section>
+
+<!-- ② 분류 -->
+<section id="s1">
+  <div class="card">
+    <h2>② 연못 생태계 구성요소 분류하기</h2>
+    <p class="goal">카드를 누른 뒤 알맞은 칸을 누르세요. 칸에 들어간 카드를 다시 누르면 제자리로 돌아가요.</p>
+    <div class="pool" id="pool"></div>
+    <div class="bins">
+      <div class="bin b-abiotic" data-bin="abiotic"><h4>☀️ 비생물요소</h4><small>생물이 살아가는 데 영향을 주는 환경</small><div class="in"></div></div>
+      <div class="biowrap"><h4>🧬 생물요소</h4>
+        <div class="bio">
+          <div class="bin b-producer" data-bin="producer"><h4>생산자</h4><small>빛에너지로 양분을 스스로 만듦</small><div class="in"></div></div>
+          <div class="bin b-consumer" data-bin="consumer"><h4>소비자</h4><small>다른 생물을 먹어 양분을 얻음</small><div class="in"></div></div>
+          <div class="bin b-decomposer" data-bin="decomposer"><h4>분해자</h4><small>사체·배설물을 분해해 양분을 얻음</small><div class="in"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="row" style="margin-top:12px"><button class="btn" id="sort-check">확인하기</button><button class="btn ghost" id="sort-reset">다시 하기</button></div>
+    <div class="feedback" id="sort-fb"></div>
+  </div>
+  <div class="card">
+    <label for="sort-why">헷갈렸던 카드 하나를 골라, 그렇게 분류한 까닭을 써 보세요.</label>
+    <textarea id="sort-why" data-save placeholder="예) 버섯은 식물처럼 보이지만 광합성을 하지 않고, 죽은 나무를 분해해서 양분을 얻으므로 분해자이다."></textarea>
+  </div>
+</section>
+
+<!-- ③ 사례 탐정 -->
+<section id="s2">
+  <div class="card">
+    <h2>③ 상호 관계 탐정</h2>
+    <p class="goal">각 사례에서 ① 관련된 비생물요소를 고르고 ② 영향의 방향을 고르세요. <span class="score" id="case-score"></span></p>
+    <div class="cases" id="cases"></div>
+  </div>
+  <div class="card">
+    <label for="case-rule">탐정 결론: 사례들을 보고 찾은 규칙을 한 문장으로 써 보세요.</label>
+    <textarea id="case-rule" data-save placeholder="예) 비생물요소는 생물의 생김새와 생활 방식에 영향을 주고, 생물도 비생물요소를 바꾼다."></textarea>
+  </div>
+</section>
+
+<!-- ④ 모둠 카드 -->
+<section id="s3">
+  <div class="card">
+    <h2>④ 우리 모둠 탐구 카드</h2>
+    <p class="goal">교과서에 없는 새 사례를 찾아 카드로 만들고, 완성되면 <b>복사</b>해서 패들렛에 올려요. (사진이나 그림을 함께 올리면 더 좋아요!)</p>
+    <div class="grid2">
+      <div>
+        <label for="g-name">모둠 이름</label><input id="g-name" data-save>
+        <label for="g-org">생물요소 (생물 이름)</label><input id="g-org" data-save placeholder="예) 낙타">
+        <label for="g-role">이 생물은?</label>
+        <select id="g-role" data-save><option value="">선택</option><option>생산자</option><option>소비자</option><option>분해자</option></select>
+        <label for="g-fac">관련된 비생물요소</label>
+        <select id="g-fac" data-save><option value="">선택</option><option>빛</option><option>공기</option><option>온도</option><option>물</option><option>토양</option></select>
+        <label for="g-dir">영향의 방향</label>
+        <select id="g-dir" data-save><option value="">선택</option><option value="a2b">비생물요소 → 생물요소</option><option value="b2a">생물요소 → 비생물요소</option></select>
+        <label for="g-desc">사례 설명 (무엇이 어떻게 달라졌나?)</label>
+        <textarea id="g-desc" data-save placeholder="예) 사막에 사는 낙타는 물을 거의 마시지 않아도 오래 견딜 수 있도록 ..."></textarea>
+        <label for="g-q">발표 때 친구들에게 던질 질문</label>
+        <div class="row" id="g-starters" style="margin-bottom:6px"></div>
+        <textarea id="g-q" data-save placeholder="예) 만약 사막의 온도가 더 올라간다면 낙타는 어떻게 될까?"></textarea>
+      </div>
+      <div>
+        <h3>미리보기</h3>
+        <div class="preview" id="g-prev"></div>
+        <div class="row" style="margin-top:10px"><button class="btn" id="g-copy">📋 패들렛용 텍스트 복사</button></div>
+        <div class="feedback" id="g-fb"></div>
+        <div class="card" style="margin-top:12px">
+          <h3>🖼️ 갤러리 워크 때</h3>
+          <p class="small">다른 모둠 카드에 댓글을 남겨요.<br>· 👍 좋은 점 한 가지<br>· ❓ 궁금한 점 한 가지 (왜? 만약 ~라면?)<br>· 🔁 방향이 맞는지 확인 (비생물→생물 / 생물→비생물)</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ⑤ 스스로 확인 -->
+<section id="s4">
+  <div class="card">
+    <h2>⑤ 스스로 확인하기</h2>
+    <ol class="quiz" id="quiz"></ol>
+    <div class="feedback" id="quiz-fb"></div>
+  </div>
+  <div class="card">
+    <label for="final">처음 질문으로 돌아가기: 지렁이가 사는 밭에서 배추가 잘 자라는 까닭을 오늘 배운 말(생물요소, 비생물요소, 분해자, 영향)을 써서 설명해 보세요.</label>
+    <textarea id="final" data-save></textarea>
+    <p class="small" id="my-best"></p>
+  </div>
+</section>
+
+</main>
+<footer>입력한 내용은 이 기기의 브라우저에만 저장돼요.</footer>
+
+<script>
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem('eco-'+k); return v===null ? d : JSON.parse(v); }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem('eco-'+k, JSON.stringify(v)); }catch(e){} }
+};
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+// 단계 이동
+const navBtns = [...document.querySelectorAll('#nav button')];
+function go(i){
+  navBtns.forEach((b,j)=>b.classList.toggle('on', i===j));
+  document.querySelectorAll('section').forEach((s,j)=>s.classList.toggle('on', i===j));
+  store.set('step', i);
+  window.scrollTo(0,0);
+}
+navBtns.forEach((b,i)=>b.onclick=()=>go(i));
+function markDone(i){ navBtns[i].classList.add('done'); const d=store.get('done',[]); if(!d.includes(i)){ d.push(i); store.set('done',d);} }
+store.get('done',[]).forEach(i=>navBtns[i] && navBtns[i].classList.add('done'));
+
+// 자동 저장 입력칸
+document.querySelectorAll('[data-save]').forEach(el=>{
+  el.value = store.get('f-'+el.id, '');
+  el.addEventListener('input', ()=>{ store.set('f-'+el.id, el.value); if(el.id.startsWith('g-')) renderPreview(); });
+});
+
+// 질문 시작말
+const starters = ['왜 ~일까?','만약 ~이 없다면 어떻게 될까?','~와 ~는 어떤 관계일까?','~은 어떻게 ~에 영향을 줄까?'];
+function fillStarters(box, target){
+  starters.forEach(t=>{
+    const b=document.createElement('button'); b.className='chip'; b.textContent=t;
+    b.onclick=()=>{ const ta=$(target); ta.value += (ta.value?' ':'')+t; ta.focus(); ta.dispatchEvent(new Event('input')); };
+    $(box).appendChild(b);
+  });
+}
+fillStarters('#q-starters','#q-in');
+fillStarters('#g-starters','#g-q');
+
+// ① 질문
+let qs = store.get('qs', []), best = store.get('best', -1);
+function renderQs(){
+  $('#q-list').innerHTML = qs.map((q,i)=>`<li><button class="star" data-i="${i}" aria-label="대표 질문으로 선택">${i===best?'⭐':'☆'}</button> ${esc(q)}</li>`).join('');
+  $('#q-list').querySelectorAll('.star').forEach(b=>b.onclick=()=>{ best=+b.dataset.i; store.set('best',best); renderQs(); });
+  $('#my-best').textContent = best>=0 && qs[best] ? '⭐ 나의 대표 질문: '+qs[best] : '';
+  if(qs.length>=3 && best>=0) markDone(0);
+}
+$('#q-add').onclick=()=>{ const v=$('#q-in').value.trim(); if(!v) return; qs.push(v); store.set('qs',qs); $('#q-in').value=''; renderQs(); };
+renderQs();
+
+// ② 분류
+const ITEMS = [
+  {n:'공기',e:'💨',a:'abiotic'},{n:'빛',e:'☀️',a:'abiotic'},{n:'온도',e:'🌡️',a:'abiotic'},{n:'물',e:'💧',a:'abiotic'},{n:'토양',e:'🟫',a:'abiotic'},
+  {n:'수련',e:'🪷',a:'producer'},{n:'부들',e:'🌾',a:'producer'},{n:'검정말',e:'🌿',a:'producer'},{n:'부레옥잠',e:'🌱',a:'producer'},
+  {n:'오리',e:'🦆',a:'consumer'},{n:'개구리',e:'🐸',a:'consumer'},{n:'붕어',e:'🐟',a:'consumer'},{n:'다슬기',e:'🐌',a:'consumer'},{n:'짚신벌레',e:'🦠',a:'consumer'},
+  {n:'버섯',e:'🍄',a:'decomposer'}
+];
+const HINT = {
+  abiotic:'생물이 아니라 생물이 살아가는 데 영향을 주는 환경이에요.',
+  producer:'물속에 살아도 식물이에요. 빛을 받아 광합성으로 양분을 만들어요.',
+  consumer:'스스로 양분을 만들지 못하고 다른 생물을 먹어요.',
+  decomposer:'버섯은 식물이 아닌 균류예요! 광합성을 하지 않고 죽은 생물을 분해해 양분을 얻어요.'
+};
+let place = store.get('place', {}), sel = null;
+function renderSort(checked){
+  const pool=$('#pool'); pool.innerHTML='';
+  document.querySelectorAll('.bin .in').forEach(x=>x.innerHTML='');
+  ITEMS.forEach(it=>{
+    const b=document.createElement('button'); b.className='item'; b.innerHTML=`<span class="e">${it.e}</span>${it.n}`;
+    if(sel===it.n) b.classList.add('sel');
+    const at = place[it.n];
+    if(checked && at) b.classList.add(at===it.a?'ok':'no');
+    b.onclick=e=>{ e.stopPropagation(); if(at){ delete place[it.n]; store.set('place',place); sel=null; } else sel = sel===it.n?null:it.n; renderSort(); };
+    (at ? document.querySelector(`.bin[data-bin="${at}"] .in`) : pool).appendChild(b);
+  });
+  document.querySelectorAll('.bin').forEach(bin=>bin.classList.toggle('target', !!sel));
+  if(!checked) $('#sort-fb').textContent='';
+}
+document.querySelectorAll('.bin').forEach(bin=>bin.onclick=()=>{ if(!sel) return; place[sel]=bin.dataset.bin; store.set('place',place); sel=null; renderSort(); });
+$('#sort-check').onclick=()=>{
+  renderSort(true);
+  const wrong = ITEMS.filter(it=>place[it.n] && place[it.n]!==it.a);
+  const left = ITEMS.filter(it=>!place[it.n]).length;
+  let msg = `${ITEMS.length-left-wrong.length} / ${ITEMS.length}개 정답.`;
+  if(left) msg += ` 아직 ${left}개가 남았어요.`;
+  if(wrong.length) msg = msg + '<br>' + wrong.map(it=>`<b>${it.e} ${it.n}</b>: ${HINT[it.a]}`).join('<br>');
+  if(!left && !wrong.length){ msg = '🎉 모두 정답! 비생물요소 5개, 생산자 4개, 소비자 5개, 분해자 1개예요. 연못 바닥의 세균도 분해자랍니다.'; markDone(1); }
+  $('#sort-fb').innerHTML = msg;
+};
+$('#sort-reset').onclick=()=>{ place={}; store.set('place',place); sel=null; renderSort(); };
+renderSort();
+
+// ③ 사례 탐정
+const FACTORS = ['빛','공기','온도','물','토양'];
+const CASES = [
+  {e:'🌼',t:'국화는 낮이 짧아지는 가을에 꽃이 핀다.',f:'빛',d:'a2b',x:'낮의 길이(빛을 받는 시간)가 꽃 피는 시기를 결정해요.'},
+  {e:'🦊',t:'사막여우는 북극여우보다 몸집이 작고 귀가 크다.',f:'온도',d:'a2b',x:'더운 곳에서는 큰 귀로 몸의 열을 잘 내보내요. 추운 곳의 북극여우는 귀가 작아 열을 덜 잃어요.'},
+  {e:'🌵',t:'건조한 곳에 사는 선인장은 잎이 가시로 변했다.',f:'물',d:'a2b',x:'잎이 가시가 되면 물이 덜 빠져나가 건조한 환경에서 살 수 있어요.'},
+  {e:'🌱',t:'염분이 많은 갯벌에 사는 함초는 염분을 저장하는 조직이 발달했다.',f:'토양',d:'a2b',x:'토양의 염분 농도가 함초의 몸 구조에 영향을 주었어요.'},
+  {e:'🐧',t:'추운 지역에 사는 펭귄은 피하 지방층이 두껍다.',f:'온도',d:'a2b',x:'두꺼운 지방층이 체온을 지켜 줘요.'},
+  {e:'🌳',t:'식물이 광합성을 하여 공기 중 산소 농도가 높아진다.',f:'공기',d:'b2a',x:'생물(식물)이 공기의 성분을 바꾸었어요.'},
+  {e:'🦫',t:'비버가 댐을 쌓자 강물이 느려지고 주변이 습지로 바뀌었다.',f:'물',d:'b2a',x:'생물(비버)이 물의 흐름과 주변 환경을 바꾸었어요.'},
+  {e:'🐄',t:'소가 트림과 방귀로 대기 중에 메테인을 내보낸다.',f:'공기',d:'b2a',x:'생물(소)이 공기의 성분을 바꾸었어요. 메테인은 온실 기체예요.'},
+  {e:'🚁',t:'사람이 드론으로 비료를 뿌려 논의 땅이 비옥해졌다.',f:'토양',d:'b2a',x:'생물(사람)이 토양의 양분을 바꾸었어요.'},
+  {e:'🪱',t:'지렁이가 흙 속을 다니며 낙엽을 먹고 배설물을 남겨 흙이 부드럽고 기름지게 된다.',f:'토양',d:'b2a',x:'지렁이는 흙에 공기가 잘 통하게 하고, 낙엽 같은 유기물을 분해해 양분을 늘려요. 그래서 배추가 잘 자라요!'}
+];
+let ans = store.get('cases', {});
+function renderCases(){
+  const box=$('#cases'); box.innerHTML='';
+  let solved=0;
+  CASES.forEach((c,i)=>{
+    const a = ans[i] || {};
+    const done = a.f && a.d;
+    const ok = done && a.f===c.f && a.d===c.d;
+    if(ok) solved++;
+    const el=document.createElement('div'); el.className='case'+(ok?' solved':'');
+    el.innerHTML = `<div class="em">${c.e}</div><p>${c.t}</p>
+      <span class="tag">① 비생물요소</span><div class="opts">${FACTORS.map(f=>`<button class="opt ${a.f===f?'on':''}" data-k="f" data-v="${f}">${f}</button>`).join('')}</div>
+      <span class="tag">② 영향의 방향</span><div class="opts">
+        <button class="opt ${a.d==='a2b'?'on':''}" data-k="d" data-v="a2b">비생물 → 생물</button>
+        <button class="opt ${a.d==='b2a'?'on':''}" data-k="d" data-v="b2a">생물 → 비생물</button></div>
+      ${done ? `<div class="res ${ok?'ok':'no'}">${ok ? '✅ '+c.x : '🤔 다시 생각해 봐요. '+(a.f!==c.f?'어떤 환경 조건이 달라졌나요? ':'')+(a.d!==c.d?'무엇이 원인이고 무엇이 바뀌었나요?':'')}</div>` : ''}`;
+    el.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{ ans[i] = {...(ans[i]||{}), [b.dataset.k]: b.dataset.v}; store.set('cases',ans); renderCases(); });
+    box.appendChild(el);
+  });
+  $('#case-score').textContent = `해결 ${solved} / ${CASES.length}`;
+  if(solved===CASES.length) markDone(2);
+}
+renderCases();
+
+// ④ 모둠 카드
+const val = id => $('#'+id).value.trim();
+function renderPreview(){
+  const bio = `<div class="box" style="background:var(--orange-soft)">🧬 ${esc(val('g-org')||'생물요소')}<br><small>${esc(val('g-role'))}</small></div>`;
+  const abio = `<div class="box" style="background:var(--blue-soft)">☀️ ${esc(val('g-fac')||'비생물요소')}</div>`;
+  const pair = val('g-dir')==='b2a' ? bio+'<span class="ar">➡</span>'+abio : abio+'<span class="ar">➡</span>'+bio;
+  $('#g-prev').innerHTML = `<b>${esc(val('g-name')||'우리 모둠')}</b>의 탐구 카드
+    <div class="arrow">${pair}</div>
+    <p>${esc(val('g-desc')||'사례 설명을 써 주세요.')}</p>
+    <p class="small">❓ ${esc(val('g-q')||'친구들에게 던질 질문')}</p>`;
+}
+$('#g-copy').onclick=async()=>{
+  if(!val('g-org')||!val('g-fac')||!val('g-dir')||!val('g-desc')){ $('#g-fb').textContent='생물요소, 비생물요소, 방향, 사례 설명을 모두 채워 주세요.'; return; }
+  const dir = val('g-dir')==='a2b' ? `${val('g-fac')} → ${val('g-org')}` : `${val('g-org')} → ${val('g-fac')}`;
+  const txt = `[${val('g-name')||'우리 모둠'}] 탐구 카드\n생물요소: ${val('g-org')} (${val('g-role')||'-'})\n비생물요소: ${val('g-fac')}\n영향의 방향: ${dir}\n사례: ${val('g-desc')}\n질문: ${val('g-q')||'-'}`;
+  try{ await navigator.clipboard.writeText(txt); $('#g-fb').textContent='복사 완료! 패들렛 게시물에 붙여 넣으세요.'; }
+  catch(e){ $('#g-fb').innerHTML='자동 복사가 안 돼요. 아래 내용을 길게 눌러 복사하세요.<br><textarea readonly>'+esc(txt)+'</textarea>'; }
+  markDone(3);
+};
+renderPreview();
+
+// ⑤ 스스로 확인
+const QUIZ = [
+  {q:'군집 안의 생물이 다른 생물, 주변 환경과 서로 영향을 주고받으며 살아가는 체계를 무엇이라고 할까?',o:['개체군','생태계','군집'],a:1,x:'생태계 = 생물요소 + 비생물요소 + 그 사이의 상호작용'},
+  {q:'다른 생물의 사체나 배설물을 분해하여 양분을 얻는 생물을 소비자라고 한다.',o:['○','×'],a:1,x:'분해자예요. (예: 버섯, 곰팡이, 세균)'},
+  {q:'국화가 낮이 짧아지는 시기에 꽃이 피는 것과 관련된 비생물요소는 토양이다.',o:['○','×'],a:1,x:'빛(낮의 길이)과 관련 있어요.'},
+  {q:'식물이 광합성을 하여 공기 중의 산소 농도를 높이는 것은?',o:['비생물요소 → 생물요소','생물요소 → 비생물요소'],a:1,x:'생물(식물)이 비생물요소(공기)를 바꾼 사례예요.'},
+  {q:'다음 중 생산자는?',o:['버섯','검정말','다슬기'],a:1,x:'검정말은 물속에서 광합성을 하는 식물이에요.'}
+];
+let qa = store.get('quiz', {});
+function renderQuiz(){
+  $('#quiz').innerHTML = QUIZ.map((z,i)=>`<li>${z.q}<div class="opts">${z.o.map((o,j)=>`<button class="opt ${qa[i]===j?'on':''}" data-i="${i}" data-j="${j}">${o}</button>`).join('')}</div>${qa[i]!==undefined?`<div class="small">${qa[i]===z.a?'✅ 정답! ':'❌ 오답. '}${z.x}</div>`:''}</li>`).join('');
+  $('#quiz').querySelectorAll('.opt').forEach(b=>b.onclick=()=>{ qa[b.dataset.i]=+b.dataset.j; store.set('quiz',qa); renderQuiz(); });
+  const n = Object.keys(qa).length, c = QUIZ.filter((z,i)=>qa[i]===z.a).length;
+  $('#quiz-fb').textContent = n ? `${c} / ${QUIZ.length} 정답` : '';
+  if(n===QUIZ.length) markDone(4);
+}
+renderQuiz();
+
+go(store.get('step',0));
+</script>
+</body>
+</html>
